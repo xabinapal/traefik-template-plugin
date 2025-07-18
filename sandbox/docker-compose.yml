@@ -1,0 +1,47 @@
+---
+name: traefik-template-plugin-sandbox
+
+services:
+  traefik:
+    image: docker.io/library/traefik:v3.4.1
+    restart: unless-stopped
+    command:
+      - --log.level=DEBUG
+      - --accesslog=true
+      - --ping=true
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik-template-plugin-sandbox
+      - --experimental.localPlugins.templatePlugin.modulename=github.com/xabinapal/traefik-template-plugin
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../:/plugins-local/src/github.com/xabinapal/traefik-template-plugin:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik.service=api@internal
+
+  whoami:
+    image: docker.io/traefik/whoami:v1.11.0
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+
+      - traefik.http.routers.whoami.entrypoints=web
+      - traefik.http.routers.whoami.rule=Host(`whoami.localhost`)
+      - traefik.http.routers.whoami.middlewares=whoami_template
+      - traefik.http.middlewares.whoami_template.plugin.templatePlugin.headers.X-Demo=test
+      - traefik.http.middlewares.whoami_template.plugin.templatePlugin.headers.X-Url=http://localhost
+
+networks:
+  default:
+    name: traefik-template-plugin-sandbox

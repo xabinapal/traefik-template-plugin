@@ -1,12 +1,12 @@
-displayName: Demo Plugin
+displayName: Traefik Template Plugin
 type: middleware
 iconPath: .assets/icon.png
 
-import: github.com/traefik/plugindemo
+import: github.com/xabinapal/traefik-template-plugin
 
-summary: '[Demo] Add Request Header'
+summary: 'Template plugin that injects headers into requests forwarded to upstream services.'
 
 testData:
-  Headers:
+  headers:
     X-Demo: test
     X-URL: '{{URL}}'

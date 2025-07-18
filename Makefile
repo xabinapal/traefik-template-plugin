@@ -1,8 +1,18 @@
-.PHONY: lint test vendor clean
+.POSIX:
 
-export GO111MODULE=on
+$(V).SILENT:
+
+.PHONY: vendor clean lint test yaegi_test
+
+PACKAGES := $(shell go list ./...)
 
 default: lint test
+
+vendor:
+	go mod vendor
+
+clean:
+	rm -rf ./vendor
 
 lint:
 	golangci-lint run
@@ -11,10 +21,7 @@ test:
 	go test -v -cover ./...
 
 yaegi_test:
-	yaegi test -v .
+	$(foreach pkg, $(PACKAGES), yaegi test -v $(pkg);)
 
-vendor:
-	go mod vendor
-
-clean:
-	rm -rf ./vendor
+e2e_test:
+	cd e2e && npm install --include=dev && npm run test
