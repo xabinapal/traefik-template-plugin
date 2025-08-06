@@ -2,7 +2,7 @@
 
 $(V).SILENT:
 
-.PHONY: vendor clean lint test yaegi_test
+.PHONY: vendor clean lint test yaegi_test e2e_test
 
 PACKAGES := $(shell go list ./...)
 
